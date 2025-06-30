@@ -1,0 +1,75 @@
+/* General page background and font settings */
+body {
+  background-color: #a3c1ad;  /* light green */
+  color: #000000;             /* default text color (black) */
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  padding: 0;
+  margin: 0;
+}
+
+/* Section backgrounds for better readability */
+section {
+  background-color: rgba(255, 255, 255, 0.88);
+  padding: 20px;
+  border-radius: 10px;
+  color: #000000;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  color: #003300;
+}
+
+/* Code blocks */
+pre, code {
+  background-color: #e6f2e6 !important;  /* soft green */
+  color: #003300 !important;             /* dark readable green text */
+  font-family: Consolas, monospace;
+  font-size: 0.95em;
+  padding: 10px;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+/* Inline code */
+code {
+  background-color: #ddf0dd !important;
+  padding: 3px 5px;
+  border-radius: 4px;
+}
+
+/* Output cells (from code) */
+.output {
+  background-color: #eef9ee;
+  color: #003300;
+  border-left: 3px solid #66aa66;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+/* Tables */
+table {
+  background-color: #d0e6d0;
+  color: #002200;
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.95em;
+}
+
+th, td {
+  border: 1px solid #99bb99;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #a3c1ad;
+  color: #003300;
+}
+
+/* Links */
+a {
+  color: #005500;
+  text-decoration: underline;
+}

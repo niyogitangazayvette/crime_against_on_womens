@@ -1,0 +1,308 @@
+---
+title: Crime Against on women
+jupyter:
+  kernelspec:
+    display_name: Python [conda env:base] *
+    language: python
+    name: conda-base-py
+---
+
+
+This dataset provides a comprehensive overview of crime statistics reported across various Indian states over a series of years, beginning from 2001. Each record represents the number of reported cases for a specific type of crime in a particular state and year. The structured format of this data allows for in-depth analysis of crime trends over time, regional comparisons, and insights into the prevalence of different types of criminal activities. This dataset is particularly useful for data visualization, policy assessment, and criminological research.
+
+
+**State**: The name of the Indian state or union territory where the crimes were reported.
+- **Year**: The year in which the crimes were recorded.
+- **Kidnap And Assault**:Unlawful taking or abduction of a person against their will, typically to demand ransom or exert pressure.
+- **Dowry Deaths**:the death of a woman caused by harassment or violence related to dowry demands.
+- **assault against women**:criminal acts involving physical or sexual violence, threats, or force directed specifically at women
+- **Assault against modesty of women**:a legal and statistical term used in many crime records (especially in India) to refer to actions that violate the personal dignity, privacy, and decency of a woman, without necessarily involving physical violence like in rape or grievous assault.
+- **Domestic violence**:physical, emotional, sexual, or economic abuse that occurs within a domestic setting — typically between intimate partners, family members, or individuals living in the same household.
+- **Women Trafficking**:
+
+```{python}
+#Importing Libraries
+import os
+import pandas as pd
+import numpy as np
+```
+
+## Define and Create Directory Paths
+
+To ensure reproducibility andorganized storage, we programmatically create directories for:
+
+- **raw data**
+- **processed data**
+- **results**
+- **documentation**
+
+These directories will store intermediate and final outputs for reproducibility.
+
+
+```{python}
+#get working directories
+current_dir = os.getcwd() 
+#Go one directory up to the root directory
+project_root_dir = os.path.dirname(current_dir) 
+project_root_dir
+# Define paths to the data folders
+data_dir = os.path.join(project_root_dir, "Data")
+raw_dir = os.path.join(data_dir, "raw")
+processed_dir = os.path.join(data_dir, "processed")
+# Define paths to results folder
+results_dir = os.path.join(project_root_dir, "results")
+#define paths to the docs folder
+docs_dir = os.path.join(project_root_dir,"docs")
+
+# Creates directories if they do not exist
+os.makedirs(raw_dir, exist_ok = True)
+os.makedirs(processed_dir, exist_ok = True)
+os.makedirs(results_dir, exist_ok = True)
+os.makedirs(docs_dir, exist_ok = True)
+
+
+```
+
+## Loading the Dataset 
+
+We load the **crime against woman data.csv** as a CSV file.
+
+-we load the **description.csv**
+
+Key considerations here are:
+we create some columns name from short into long columns name
+
+
+
+```{python}
+crimes_df = pd.read_csv(r"C:\Users\user\Downloads\Crime Against Woman\CrimesOnWomenData.csv")
+description_df = pd.read_csv(r"C:\Users\user\Downloads\Crime Against Woman\description.csv")
+crimes_df.head(), description_df.head()
+```
+
+We also inspect the dataset's shape. We see that the data has 736 rows and 10 columns.
+
+```{python}
+crimes_df.shape
+```
+
+In addition, we check  also the data types using .info.
+
+### DataFrame Structure Summary
+
+| Column Name   | Non-Null Count | Data Type | Description                          |
+|---------------|----------------|-----------|--------------------------------------|
+| Unnamed: 0    | 736            | int64     | Index column from CSV (can be dropped) |
+| State         | 736            | object    | Name of the Indian state or UT       |
+| Year          | 736            | int64     | Year of the record                   |
+| Rape          | 736            | int64     | Number of rape cases                 |
+| K&A           | 736            | int64     | Kidnap and Assault cases             |
+| DD            | 736            | int64     | Dowry Deaths                         |
+| AoW           | 736            | int64     | Assault against Women                |
+| AoM           | 736            | int64     | Assault on Modesty of Women         |
+| DV            | 736            | int64     | Domestic Violence                    |
+| WT            | 736            | int64     | Women Trafficking                    |
+
+```{python}
+crimes_df.info()
+```
+
+```{python}
+crimes_df.columns
+```
+
+
+# Data Cleaning and Transformation Process
+
+## 1. Initial Raw Dataset
+
+We started with a raw dataset containing information on various crimes reported against women across Indian states and union territories from 2001 to 2021. However, this dataset was not ready for analysis because:
+
+- It contained **missing or inconsistent values** (e.g., `NaN`)
+- Some **text columns** had extra spaces, inconsistent casing, or misspellings
+- The data was presented in a **wide format** (each year as a separate column)
+
+---
+
+## 2. Cleaning Steps Applied
+
+### a. Handled Missing Values
+
+- We identified and filled or removed rows with missing values depending on their impact.
+- For important columns like `State/UT` or `Crime Type`, missing values were filled with `"unknown"` or dropped using `dropna()` if needed.
+
+### b. Standardized Text Data
+
+- Removed extra spaces using `.str.strip()`
+- Converted all categorical text to lowercase using `.str.lower()` to maintain consistency
+- Renamed similar values to unified categories (e.g., `"Andhra Pradesh "` → `"andhra pradesh"`)
+
+### c. Renamed Columns
+
+- Renamed columns to more descriptive names using:
+
+```python
+df.columns = ['state_ut', 'crime_type', '2001', '2002', ..., '2021']
+
+```{python}
+# Checking if there are missing values
+crimes_df.isnull().sum().sum()
+```
+
+```{python}
+# Checking for duplicate
+crimes_df.duplicated().sum()
+```
+
+### Manually define the short and long column names 
+Raw data column names can be very long, complicated, or not user-friendly. Manually defining short column names makes it easier to reference them in code or visualizations without confusion.
+
+```{python}
+#| scrolled: true
+# Manually define the short and long column names as lists
+short_names = ['State', 'Year', 'Rape', 'K&A', 'DD', 'AoM', 'AoW', 'DV', 'WT']
+long_names = ['State', 'Year', 'No. of Rape cases', 'Kidnap And Assault', 'Dowry Deaths',
+              'Assault against modesty of women', 'Assault against women',
+              'Domestic violence', 'Women Trafficking']
+
+# Create a mapping using zip()
+column_mapping = dict(zip(short_names, long_names))
+
+# Apply the mapping to rename columns
+crimes_df.rename(columns=column_mapping, inplace=True)
+crimes_df
+```
+
+```{python}
+crimes_df.to_csv('Cleaned_crimes_on_women.csv', index=False)
+```
+
+###  List of States in Dataset
+
+| #  | State               |
+|----|---------------------|
+| 1  | andhra pradesh      |
+| 2  | arunachal pradesh   |
+| 3  | assam               |
+| 4  | bihar               |
+| 5  | chhattisgarh        |
+| 6  | goa                 |
+| 7  | gujarat             |
+| 8  | haryana             |
+| 9  | himachal pradesh    |
+| 10 | jammu & kashmir     |
+| 11 | jharkhand           |
+| 12 | karnataka           |
+| 13 | kerala              |
+| 14 | madhya pradesh      |
+| 15 | maharashtra         |
+| 16 | manipur             |
+| 17 | meghalaya           |
+| 18 | mizoram             |
+| 19 | nagaland            |
+| 20 | odisha              |
+| 21 | punjab              |
+| 22 | rajasthan           |
+| 23 | sikkim              |
+| 24 | tamil nadu          |
+| 25 | tripura             |
+| 26 | uttar pradesh
+
+```{python}
+# Convert all state names to lowercase
+crimes_df['State'] = crimes_df['State'].str.lower()
+
+# Display unique states to verify transformation
+crimes_df['State'].unique()
+```
+
+```{python}
+crimes_df
+```
+
+### Checking duplicate
+Finding duplicates is an essential part of data cleaning and preprocessing before doing any analysis.
+
+and there is no duplicate
+
+###  Duplicate Row Check Summary
+
+| Total Rows | Duplicate Rows | Unique Rows | Any Duplicates? |
+|------------|----------------|-------------|------------------|
+| 736        | 0              | 736         | No               |
+
+```{python}
+crimes_df.duplicated()
+```
+
+###  Remove Unnecessary Column
+
+During the cleaning process, we identified a column that was not relevant to our analysis and did not add meaningful value. To maintain a clean and focused dataset, we decided to remove this column.
+
+- Reduces noise in the data  
+- Improves performance during analysis  
+- Makes visualizations and summaries more clear  
+
+```{python}
+crimes_df
+```
+
+### Reshape Data from Wide Format into Long Format
+
+The original dataset was in **wide format**, where each year (e.g., 2001, 2002, ..., 2021) was represented as a separate column. This made it difficult to visualize and analyze time-based trends.
+
+We reshaped the dataset into **long format** using the `pd.melt()` function.
+
+This transformation was important because it:
+
+- Makes it easier to create time-series visualizations  
+- Helps us compare values across different years more effectively  
+- Simplifies grouping and filtering by year or crime type  
+- Organizes the data in a more analysis-friendly structure  
+
+```{python}
+# Melt (reshape) the data
+df_long = crimes_df.melt(id_vars=["State", "Year"], 
+                  var_name="Crime Type", 
+                  value_name="Value")
+
+# Save reshaped data
+final_file = os.path.join(processed_dir, 'reshaped_data.csv')
+df_long.to_csv("reshaped_data.csv", index=False) 
+```
+
+### Save the Reshaped Dataset to CSV
+
+After successfully cleaning and reshaping the dataset from wide to long format, we saved the final version to a CSV file named `reshaped.csv`.
+
+This step ensures that the cleaned and structured data is:
+
+- Stored for future use without needing to repeat the cleaning steps
+- Ready for further analysis, visualizations, or modeling
+- Easily shareable with others or usable in other tools like Excel, Tableau, or Power BI
+
+### Dataset Preview: Crime Against Women
+
+| Index | State              | Year | Crime Type           | Value |
+|-------|--------------------|------|-----------------------|-------|
+| 0     | andhra pradesh     | 2001 | No. of Rape cases     | 871   |
+| 1     | arunachal pradesh  | 2001 | No. of Rape cases     | 33    |
+| 2     | assam              | 2001 | No. of Rape cases     | 817   |
+| 3     | bihar              | 2001 | No. of Rape cases     | 888   |
+| 4     | chhattisgarh       | 2001 | No. of Rape cases     | 959   |
+| ...   | ...                | ...  | ...                   | ...   |
+| 5147  | d&n haveli         | 2021 | Women Trafficking     | 4     |
+| 5148  | daman & diu        | 2021 | Women Trafficking     | 1     |
+| 5149  | delhi ut           | 2021 | Women Trafficking     | 0     |
+| 5150  | lakshadweep        | 2021 | Women Trafficking     | 0     |
+| 5151  | puducherry         | 2021 | Women Trafficking     | 0     |
+
+**Total rows**: 5,152  
+**Total columns**: 4
+
+```{python}
+reshaped_df=pd.read_csv(r"C:\Users\user\Downloads\Crime\crime_against_on_womens\Data\processed\reshaped_data.csv")
+reshaped_df
+```
+
+
